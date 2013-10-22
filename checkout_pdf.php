@@ -10,7 +10,21 @@ table.checkout th {  font-family: courier; font-family: freeserif;}
 <h2>XPert.kg</h2>
 <h3 style="text-align: center;">Товарный чек № <?php echo time(); ?></h3>
 <p style="text-align: right">Дата: <?php echo date_i18n("'F j, Y'"); ?></p>
-<h4>Даваян Александр Сергеевич ИНН 21803198200829</h4>
+<table border="0" width="100%"> <tr>
+        <th style="width: 100mm; text-align: left;">ИП ДАВАЯН АЛЕКСАНДР СЕРГЕЕВИЧ</th>
+        <th style="width: 100mm; text-align: right;">ИНН 21803198700829</th>
+    </tr>
+
+    <tr>
+        <th style="width: 100mm; text-align: left;">
+            р/c1171020039009780<br />
+            Бик 117010<<br />
+            ФЗАО "Исламик" "ЭкоИсламикБанк"</th>
+
+    </tr>
+
+</table>
+
 <table class="checkout" border="1" cellspacing="0" cellpadding="4">
     <tr>
         <th style="width:108mm; ">Наименование товара</th>
@@ -39,7 +53,15 @@ table.checkout th {  font-family: courier; font-family: freeserif;}
         <td><strong>Итого</strong></td>
         <td style="text-align: right;"><strong><?php echo xpert_convert_price($total); ?></strong></td>
     </tr>
+
 </table>
-    <p style="text-align: right;"><strong>Итого: <?php echo xpert_convert_price($total);?> сом</strong></p>
-    <p style="text-align: right;"><strong>Подпись продавца: ________________</strong></p>
+    <p></p>
+    <p></p>
+    <table border="0" width="100%">
+        <tr>
+            <th style="width: 100mm; text-align: left;"><strong>Подпись продавца: ________________</strong></th>
+            <th style="width: 100mm; text-align: right;"><strong>Итого: <?php echo xpert_convert_price($total);?> сом</strong></th>
+        </tr>
+    </table>
+
 </page>

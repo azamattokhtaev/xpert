@@ -12,7 +12,9 @@ Version: 0.1
 Author URI: http://azamatpsw.blogspot.com
 */
 define('XPERT_PATH', dirname(__FILE__));
-require_once('cart.php');
+require_once(XPERT_PATH.'/cart.php');
+require_once(XPERT_PATH.'/cart_widget.php');
+require_once(XPERT_PATH.'/settings.php');
 
 class XPert
 {
@@ -21,7 +23,6 @@ class XPert
         session_start();
         register_activation_hook(__FILE__, array($this, 'activate'));
         register_deactivation_hook(__FILE__, array($this, 'deactivate'));
-//        add_action( 'generate_rewrite_rules', array($this, 'add_rewrite_rules') );
         add_action('init', array($this, 'registerXPertPostType'));
         add_action("admin_init", array($this, "initAdmin"));
         add_action('save_post', array($this, 'saveMetaInformation'));
@@ -53,6 +54,7 @@ class XPert
         $vars[] = 'clear_cart';
         $vars[] = 'cart_remove';
         $vars[] = 'print';
+        $vars[] = 'change_rate';
         return $vars;
     }
 
@@ -76,9 +78,13 @@ class XPert
             $cart->remove($wp->query_vars['cart_remove']);
             wp_redirect($wp->query_vars['next']);
             exit;
+        } else if(!empty($wp->query_vars['change_rate'])){
+            $session = WP_Session::get_instance();
+            $session['price_rate'] = $wp->query_vars['change_rate'];
+            wp_redirect($wp->query_vars['next']);
+            exit;
+
         }else if (!empty($wp->query_vars['print'])) {
-
-
             require_once(dirname(__FILE__).'/html2pdf/html2pdf.class.php');
 
             $html2pdf = new HTML2PDF('P','A4','ru');
@@ -94,8 +100,6 @@ class XPert
             $html2pdf->Output('example.pdf');
 
             readfile('example.pdf');
-//            $cart->remove($wp->query_vars['cart_remove']);
-//            wp_redirect($wp->query_vars['next']);
             exit;
         }
 
@@ -178,20 +182,29 @@ class XPert
         $price = $custom['price'][0];
         ?>
 
-        <label><?php echo __('Price', 'xpert'); ?>:</label><input name="price" type="text"
-                                                                  value="<?php echo $price ?>"/>
+        <label><?php echo __('Price', 'xpert'); ?>:</label><input name="price" type="text" value="<?php echo $price ?>"/>
     <?php
     }
 
 
 }
 
-// Now we set that function up to execute when the admin_notices action is called
-
 
 function xpert_display_price($price)
 {
-    return "$" . $price;
+    $session = WP_Session::get_instance();
+    $display_currency = !empty($session['price_rate']) ? $session['price_rate']: "USD";
+
+    if($display_currency == "USD")
+    {
+        return "$" . $price;
+    }
+    else
+    {
+        $rate = get_option('xpert_conversion_rate');
+        return ($price*$rate['conversion_rate']).' '.'Сом';
+
+    }
 }
 
 $application = new XPert();
@@ -202,57 +215,9 @@ add_action('widgets_init', 'register_cart_widget'); // function to load my widge
 function register_cart_widget()
 {
     register_widget('CartWidget');
+    register_widget('ConversionRateWidget');
 
 } // function to register my widget
-
-class CartWidget extends WP_Widget
-{
-    function CartWidget()
-    {
-        $widget_ops = array('classname' => 'example', 'description' => __('User cart widget', 'example'));
-        $control_ops = array('id_base' => 'cart-widget');
-        $this->WP_Widget('cart-widget', __('Cart', 'example'), $widget_ops, $control_ops);
-    }
-
-    function widget($args, $instance)
-    {
-        $before_widget = "";
-        $before_title = "";
-        $after_title = "";
-        $after_widget = "";
-        extract($args);
-        $title = apply_filters('widget_title', $instance['title']);
-        echo $before_widget;
-        if ($title)
-            echo $before_title . $title . $after_title;
-
-        $cart = new XPertCart();
-        $cart_items = $cart->getItemsForDisplay();
-        require('items.php');
-
-        echo $after_widget;
-
-    } // display the widget
-    function update( $new_instance, $old_instance ) {
-        $instance = $old_instance;
-        //Strip tags from title and name to remove HTML
-        $instance['title'] = strip_tags( $new_instance['title'] );
-        return $instance;
-    }  // update the widget
-
-    function form($instance)
-    {
-
-        //Set up some default widget settings.
-        $defaults = array( 'title' => __('Example', 'example'));
-        $instance = wp_parse_args( (array) $instance, $defaults ); ?>
-        <p>
-            <label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e('Title'); ?>:</label>
-            <input id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" value="<?php echo $instance['title']; ?>" style="width:100%;" />
-        </p>
-    <?php
-    } // and of course the form for the widget options
-} // The example widget class
 
 add_filter('the_content', 'my_content_filter');
 function my_content_filter($content)
@@ -269,5 +234,6 @@ function my_content_filter($content)
 
 function xpert_convert_price($price)
 {
-    return $price*49.5;
+    $rate = get_option('xpert_conversion_rate');
+    return $price*$rate['conversion_rate'];
 }

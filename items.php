@@ -15,7 +15,7 @@
             ?>
             <td><?php echo $item->post_title ?></td>
 
-            <td><?php echo xpert_display_price($custom["price"][0]) ?></td>
+            <td nowrap="nowrap"><?php echo xpert_display_price($custom["price"][0]) ?></td>
             <td><?php echo $item->quantity; ?>
                 <a class="pull-right text-error"
                    href="<?php echo get_site_url(null, '?cart_remove=' . $item->ID . '&next=' . urlencode($_SERVER["REQUEST_URI"])) ?>">X</a>
@@ -31,8 +31,3 @@
 </table>
 
 <a class="btn btn-primary" href="<?php echo get_site_url(null, 'checkout') ?>">Оформить заказ</a>
-
-<!--<div class="pull-right">-->
-<!---->
-<!--<a class="btn btn-danger btn-mini" href="--><?php //echo get_site_url(null, '?clear_cart=1&next='.urlencode($_SERVER["REQUEST_URI"])) ?><!--">Очистить коризину</a>-->
-<!--    </div>-->
