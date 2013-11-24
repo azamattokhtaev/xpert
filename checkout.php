@@ -18,10 +18,10 @@
             ?>
             <td><?php echo $item->post_title ?></td>
 
-            <td><?php echo xpert_display_price($custom["price"][0]) ?></td>
+            <td nowrap="nowrap"><?php echo xpert_display_price($custom["price"][0]) ?></td>
             <td><?php echo $item->quantity; ?></td>
-            <td><?php echo xpert_display_price($item->quantity * $price); ?></td>
-            <td>    <a class="pull-right text-error" href="<?php echo get_site_url(null, '?cart_remove=' . $item->ID . '&next=' . urlencode($_SERVER["REQUEST_URI"])) ?>">X</a></td>
+            <td nowrap="nowrap"><?php echo xpert_display_price($item->quantity * $price); ?></td>
+            <td><a class="pull-right text-error" href="<?php echo get_site_url(null, '?cart_remove=' . $item->ID . '&next=' . urlencode($_SERVER["REQUEST_URI"])) ?>">X</a></td>
         </tr>
         <?php $total += $item->quantity * $price; ?>
     <?php endforeach;?>
